@@ -1,0 +1,16 @@
+react挂载的意思：
+将组件渲染，并构建DOM元素然后插入页面的过程
+
+把 react 与 redux 结合的时候，react-redux 提供了一个极其重要的方法：connect，它的作用就是选取 redux store 中的需要的 state 与 dispatch, 交由 connect 去绑定到 react 组件的 props 中
+
+
+redux-thunk的作用及源码(主要实现实现异步控制)
+function createThunkMiddleware(extraArgument) {
+    return ({ dispatch, getState }) => next => action => {
+        if (typeof action === 'function') {
+            return action(dispatch, getState, extraArgument);
+        }
+        return next(action);
+    };
+}
+它其实只干了一件事情，判断 actionCreator 返回的是不是一个函数，如果不是的话，就很普通地传给下一个（如果包含多个中间件）中间件或者传给reducer（只有一个中间件的中间件）；如果是的话，那么把 dispatch、getState、extraArgument 作为参数传入这个函数里，实现异步控制。

@@ -1,0 +1,58 @@
+npm install -g create-react-app 
+
+create-react-app myapp(项目名) 
+   
+cd myapp                                        /* 进入目录，然后启动 */
+
+npm install
+
+发现配置文件被隐藏，而且packjson也被隐藏了
+
+npm run eject 可以看到完整的项目结构
+
+config\paths.js   里面的路径，要改成
+const servedUrl = envPublicUrl || (publicUrl ? url.parse(publicUrl).pathname : './');   
+//默认是'/',如果不加上‘.’打包之后的JS和CSS会/static/css/main.12345.css，但是其实应该是./static/css/main.12345.css才对
+  return ensureSlash(servedUrl, true);
+
+然后
+package.json补上
+"less": "^2.7.2",
+"less-loader": "^4.0.5",
+"react-redux": "^4.4.5",
+"redux": "^3.5.2",
+"react-router-dom": "^4.2.2"
+
+然后在webpack配置文件补上less
+
+cnpm install cross-env --save-dev
+
+如果想在react或者你们的vue项目，引入JQ全局使用，我总结有两个方法：
+1.npm安装expose-loader和JQ，然后在webpack的loader处补上expose-loader:
+webpack v1
+module: {
+  loaders: [
+    { test: require.resolve("jquery"), loader: "expose-loader?$!expose-loader?jQuery" },
+  ]
+}
+webpack v2,v3
+{
+                test: require.resolve('jquery'),
+                use: [{
+                    loader: 'expose-loader',
+                    options: 'jQuery'
+                },{
+                    loader: 'expose-loader',
+                    options: '$'
+                }]
+}
+使用：在组件中import $ from 'jquery'
+（但貌似最后会把JQ一堆无用代码也一起打包到main.js）
+
+2.jQuery 直接在 html模板中引入，然后在 webpack 中把它配置为全局即可。
+修改webpack:
+externals: {
+    jquery: 'window.$'
+},
+使用：import $ from 'jquery'
+(相比第一种做法，第二种不会把JQ打包到最后的main.js)
